@@ -16,23 +16,45 @@ response: ['subfeddit_id', 'limit', 'skip', 'comments']
 commentsList[dict]: ['id', 'username', 'text', 'created_at']
 
 """
-import requests
+import pytest
+from unittest.mock import patch
+from utils import get_subfeddit_by_title, get_comments_by_id
 
-def test_http_endpoint(url):
-    try:
-        response = requests.get(url)
-        if response.status_code == 200:
-            print("HTTP GET request successful!")
-            print("Response content:")
-            print(response.json())  # Assuming response is JSON, adjust if otherwise
-            breakpoint()
-        else:
-            print(f"HTTP GET request failed with status code: {response.status_code}")
-            print("Response content:")
-            print(response.text)
-    except requests.RequestException as e:
-        print(f"An error occurred: {e}")
+# Dummy data for testing
+dummy_subfeddits = [
+    {"title": "python", "id": 1},
+    {"title": "programming", "id": 2},
+    {"title": "data science", "id": 3}
+]
 
-# Example usage
-url = "http://localhost:8080/api/v1/comments/?subfeddit_id=2&skip=0&limit=10"
-test_http_endpoint(url)
+dummy_comments = [
+    {"id": 1, "text": "Great post!"},
+    {"id": 2, "text": "Interesting discussion."},
+    {"id": 3, "text": "I have a question."}
+]
+
+# Mocking the _http_get_response function
+@patch('utils._http_get_response')
+def test_get_subfeddit_by_title(mock_http_get_response):
+    # Mocking the return value of _http_get_response
+    mock_http_get_response.return_value = {"subfeddits": dummy_subfeddits}
+
+    # Test case for existing subfeddit
+    assert get_subfeddit_by_title("python") == {"title": "python", "id": 1}
+
+    # Test case for non-existing subfeddit
+    assert get_subfeddit_by_title("java") is None
+
+@patch('utils._http_get_response')
+def test_get_comments_by_id(mock_http_get_response):
+    # Mocking the return value of _http_get_response
+    mock_http_get_response.return_value = {"comments": dummy_comments}
+
+    # Test case for existing subfeddit ID
+    assert get_comments_by_id(1) == dummy_comments
+
+    # Test case for non-existing subfeddit ID
+    assert get_comments_by_id(10) == []
+
+if __name__ == "__main__":
+    pytest.main()
