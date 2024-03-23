@@ -1,6 +1,7 @@
 
 import logging
 from typing import Optional, Dict, Any
+from config import RAPID_API_Key
 
 import requests
 
@@ -11,8 +12,8 @@ rapid_api_url = "https://twinword-sentiment-analysis.p.rapidapi.com/analyze/"
 
 # Request header for rapid API
 api_headers = {
-	"X-RapidAPI-Key": "debde1a720msh81c72c782cca2b4p13dcf5jsn883cdaa18b77",
-	"X-RapidAPI-Host": "twinword-sentiment-analysis.p.rapidapi.com"
+    "X-RapidAPI-Key": RAPID_API_Key,
+    "X-RapidAPI-Host": "twinword-sentiment-analysis.p.rapidapi.com"
 }
 
 logging.basicConfig(level=logging.INFO)
