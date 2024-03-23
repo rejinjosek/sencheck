@@ -16,9 +16,10 @@ response: ['subfeddit_id', 'limit', 'skip', 'comments']
 commentsList[dict]: ['id', 'username', 'text', 'created_at']
 
 """
-import pytest
-from unittest.mock import patch
-from utils import get_subfeddit_by_title, get_comments_by_id
+#import pytest
+#from unittest.mock import patch
+#from utils import get_subfeddit_by_title, get_comments_by_id
+"""
 
 # Dummy data for testing
 dummy_subfeddits = [
@@ -56,5 +57,11 @@ def test_get_comments_by_id(mock_http_get_response):
     # Test case for non-existing subfeddit ID
     assert get_comments_by_id(10) == []
 
+"""
+def test_api():
+    url = "http://localhost:8000/v1/scores/?subfeddit_title=Dummy%Topic%1&skip_records=0&limit_records=10"
+    import requests
+    response = requests.get(url)
+    print(response.json())
 if __name__ == "__main__":
     pytest.main()

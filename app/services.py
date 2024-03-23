@@ -23,13 +23,14 @@ def _get_subfeddits(skip_records: Optional[int] = None, limit_records: Optional[
     Returns:
         List[Dict[str, Any]]: List of subfeddits.
     """
+    path_params = "subfeddits/"
     if skip_records is not None and limit_records is not None:
         path_params = f"subfeddits/?skip={skip_records}&limit={limit_records}"
-        response = http_get_response(urljoin(base_url, path_params))
-    response = http_get_response(base_url)
+        
+    response = http_get_response(urljoin(base_url, path_params))
     if response:
-        return response.get('subfeddits', [])
-    return []
+        return response.get('subfeddits', "Feddit API returned an empty response")
+    return "Connection to Subfeddit API failed"
 
 def get_subfeddit_by_title(subfeddit_title: str, skip_records: Optional[int]=None, limit_records: Optional[int]=None) -> Optional[Dict[str, Any]]:
     """
@@ -44,8 +45,11 @@ def get_subfeddit_by_title(subfeddit_title: str, skip_records: Optional[int]=Non
         Optional[Dict[str, Any]]: Subfeddit with the given title, if found.
     """
     subfeddits = _get_subfeddits(skip_records=skip_records, limit_records=limit_records)
+    if len(subfeddits) == 0 or isinstance(subfeddits, str):
+        return subfeddits
+
     title_dict = {each_subfeddit['title']: each_subfeddit for each_subfeddit in subfeddits}
-    return title_dict.get(subfeddit_title)
+    return title_dict.get(subfeddit_title, "Title not found")    
 
 def get_comments_by_id(subfeddit_id: int, skip_records: int = 0, limit_records: int = 25) -> List[Dict[str, Any]]:
     """
@@ -62,8 +66,8 @@ def get_comments_by_id(subfeddit_id: int, skip_records: int = 0, limit_records: 
     path_params = f"comments/?subfeddit_id={subfeddit_id}&skip={skip_records}&limit={limit_records}"
     subfeddit = http_get_response(urljoin(base_url, path_params))
     if subfeddit:
-        return subfeddit.get('comments', [])
-    return []
+        return subfeddit.get('comments', "Feddit API send an empty response")
+    return "Connection to Feddit API Failed"
 
 
 class SentimentAnalyzer:
@@ -79,13 +83,14 @@ class SentimentAnalyzer:
         for comment in comments:
             text = comment.get('text')
             if text:
-                score_data = _get_score_from_twinword(text)
+                score_data = self._get_score_from_twinword(text)
                 if score_data and 'type' in score_data and 'score' in score_data:
                     score_info = {
                         'id':comment.get('id'),
                         'text': text,
                         'type': score_data.get('type'),
-                        'score': score_data.get('score')
+                        'score': score_data.get('score'),
+                        'created_at':comment.get('created_at')
                     }
                     comment_scores.append(score_info)
                 else:
@@ -96,12 +101,25 @@ class SentimentAnalyzer:
         return comment_scores
 
     def get_scores(self, subfeddit_title:str, skip_records:int=0, limit_records:int=25):
+        """
+        Get sentiment score for each comment
+        
+        Args:
+            subfeddit_title(str): Title of the subfeddit.
+            skip_records (int): Number of records to skip.
+            limit_records (int): Maximum number of records to fetch.
+
+        Returns:
+            List[Dict: List comments with ID, score and created timestamp]
+        """
         subfeddit = get_subfeddit_by_title(subfeddit_title=subfeddit_title)
-        if subfeddit is None:
-            return f"No subfeddit found for the title:{subfeddit_title}"
+        if isinstance(subfeddit, str):
+            # Return the error message
+            return subfeddit
         
         comments = get_comments_by_id(subfeddit_id=subfeddit['id'],)
-        if len(comments)==0:
-            return f"No comments found for the title:{subfeddit_title}"
+        if isinstance(comments, str):
+            # Return the error message
+            return comments
         
         return self._get_comment_scores(comments)
