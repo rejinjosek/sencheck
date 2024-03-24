@@ -32,7 +32,7 @@ This endpoint retrieves sentiment scores for comments within a specified subredd
 GET /scores/?subfeddit_title=science&skip_records=10&limit_records=5&sort_by_scores=true
 
 
-#### Example Response
+Example Response:
 
 
 ```json
