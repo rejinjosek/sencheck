@@ -102,7 +102,7 @@ class SentimentAnalyzer:
             return self._sort_comments_by_score(comment_scores)
         return comment_scores
 
-    def _sort_comments_by_score(list_of_comments:List[Dict]):
+    def _sort_comments_by_score(self, list_of_comments:List[Dict]):
         #Sort comments based on scores
         return sorted(list_of_comments, key=lambda x: x['score'], reverse=True)
 
