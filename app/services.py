@@ -72,13 +72,13 @@ def get_comments_by_id(subfeddit_id: int, skip_records: int = 0, limit_records: 
 
 class SentimentAnalyzer:
     def _get_score_from_twinword(self, query_string):
-        # Get scores
+        # Get score using twinword API
         query_param = {"text":query_string}
         score = http_get_response(url=rapid_api_url, headers=api_headers, params=query_param)
 
         return score    
 
-    def _get_comment_scores(self, comments):
+    def _get_comment_scores(self, comments:List[Dict], sort_by_scores:bool):
         comment_scores = []
         for comment in comments:
             text = comment.get('text')
@@ -98,9 +98,15 @@ class SentimentAnalyzer:
                     print(f"Unable to get score for comment: {text}")
                     score_info = {'id':comment.get('id'),'text': text, 'type': None, 'score': None}
                     comment_scores.append(score_info)
+        if sort_by_scores:
+            return self._sort_comments_by_score(comment_scores)
         return comment_scores
 
-    def get_scores(self, subfeddit_title:str, skip_records:int=0, limit_records:int=25):
+    def _sort_comments_by_score(list_of_comments:List[Dict]):
+        #Sort comments based on scores
+        return sorted(list_of_comments, key=lambda x: x['score'], reverse=True)
+
+    def get_scores(self, subfeddit_title:str, skip_records:int=0, limit_records:int=25, sort_by_scores:bool=False):
         """
         Get sentiment score for each comment
         
@@ -108,6 +114,7 @@ class SentimentAnalyzer:
             subfeddit_title(str): Title of the subfeddit.
             skip_records (int): Number of records to skip.
             limit_records (int): Maximum number of records to fetch.
+            sort_by_scores(bool): Sor the results based on scores
 
         Returns:
             List[Dict: List comments with ID, score and created timestamp]
@@ -117,9 +124,9 @@ class SentimentAnalyzer:
             # Return the error message
             return subfeddit
         
-        comments = get_comments_by_id(subfeddit_id=subfeddit['id'],)
+        comments = get_comments_by_id(subfeddit_id=subfeddit['id'],skip_records=skip_records,limit_records=limit_records)
         if isinstance(comments, str):
             # Return the error message
             return comments
         
-        return self._get_comment_scores(comments)
+        return self._get_comment_scores(comments, sort_by_scores)
