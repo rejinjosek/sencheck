@@ -29,7 +29,7 @@ This endpoint retrieves sentiment scores for comments within a specified subredd
 
 #### Example
 ```http
-GET /scores/?subfeddit_title=science&skip_records=10&limit_records=5&sort_by_scores=true
+GET /scores/?subfeddit_title=Dummy%Topic%1&skip_records=10&limit_records=5&sort_by_scores=true
 
 
 Example Response:
@@ -38,25 +38,25 @@ Example Response:
 ```json
 [
   {
-    "id": 303571,
-    "text": "It looks great!",
-    "type": "positive",
-    "score": 0.797954407,
-    "created_at": 1711182014
-  },
-  {
-    "id": 303572,
+    "id": 2,
     "text": "Love it.",
     "type": "positive",
     "score": 0.917220858,
-    "created_at": 1711178414
+    "created_at": 1711297744
   },
   {
-    "id": 303573,
+    "id": 3,
     "text": "Awesome.",
     "type": "positive",
     "score": 0.823558987,
-    "created_at": 1711174814
+    "created_at": 1711294144
+  },
+  {
+    "id": 1,
+    "text": "It looks great!",
+    "type": "positive",
+    "score": 0.797954407,
+    "created_at": 1711301344
   }
 ]
 

@@ -11,7 +11,7 @@ rapid_api_url = "https://twinword-sentiment-analysis.p.rapidapi.com/analyze/"
 
 # Request header for rapid API
 api_headers = {
-    "X-RapidAPI-Key": RAPID_API_Key,
+    "X-RapidAPI-Key": RAPID_API_KEY,
     "X-RapidAPI-Host": "twinword-sentiment-analysis.p.rapidapi.com",
 }
 
