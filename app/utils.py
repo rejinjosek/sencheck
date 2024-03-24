@@ -1,13 +1,13 @@
 
 import logging
 from typing import Optional, Dict, Any
-from config import RAPID_API_Key
+from config import RAPID_API_KEY
 
 import requests
 
 
 # API URL endpoints
-base_url = "http://localhost:8080/api/v1/"
+base_url = "http://feddit:8080/api/v1/"
 rapid_api_url = "https://twinword-sentiment-analysis.p.rapidapi.com/analyze/"
 
 # Request header for rapid API
@@ -16,7 +16,7 @@ api_headers = {
     "X-RapidAPI-Host": "twinword-sentiment-analysis.p.rapidapi.com"
 }
 
-logging.basicConfig(level=logging.INFO)
+
 logger = logging.getLogger(__name__)
 
 
@@ -39,18 +39,10 @@ def http_get_response(url: str, headers: Optional[Dict[str, str]] = None, params
     except requests.RequestException as e:
         logger.error(f"An error occurred while API request: {e}")
 
+def get_score_from_twinword(query_string):
+    # Get score using twinword API
+    query_param = {"text":query_string}
+    score = http_get_response(url=rapid_api_url, headers=api_headers, params=query_param)
 
-class SubfedditNotFound(Exception):
-    """Exception raised when a subfeddit is not found."""
-
-    def __init__(self, message="Subfeddit not found."):
-        self.message = message
-        super().__init__(self.message)
-
-class CommentsNotFound(Exception):
-    """Exception raised when comments are not found."""
-
-    def __init__(self, message="Comments not found."):
-        self.message = message
-        super().__init__(self.message)
+    return score    
 

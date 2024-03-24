@@ -30,14 +30,14 @@ services:
       - "db:db"
     depends_on:
       - db
-  # sencheck:
-  #   build: .
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     - feddit
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/version"]
-  #     interval: 1m30s
-  #     timeout: 10s
-  #     retries: 3
+  sencheck:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - feddit
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/version"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3

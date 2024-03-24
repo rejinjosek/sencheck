@@ -3,26 +3,19 @@ This contains the following services:
 - Fetch data from subfeddit API
 - Search for subfeddit with given title
 - Fetch comments of the given subfeddit ID
-
+- SentimentAnalyzer class for calculating polarity scores for comments
 """
 
 from urllib.parse import urljoin
 from typing import List, Optional, Dict, Any
+import logging
 
-from utils import http_get_response, base_url, rapid_api_url, api_headers
+from utils import http_get_response, base_url, get_score_from_twinword
 
+
+logger = logging.getLogger(__name__)
 
 def _get_subfeddits(skip_records: Optional[int] = None, limit_records: Optional[int] = None) -> List[Dict[str, Any]]:
-    """
-    Fetches subfeddits from the API.
-
-    Args:
-        skip_records (int): Number of records to skip.
-        limit_records (int): Maximum number of records to fetch.
-
-    Returns:
-        List[Dict[str, Any]]: List of subfeddits.
-    """
     path_params = "subfeddits/"
     if skip_records is not None and limit_records is not None:
         path_params = f"subfeddits/?skip={skip_records}&limit={limit_records}"
@@ -71,19 +64,13 @@ def get_comments_by_id(subfeddit_id: int, skip_records: int = 0, limit_records: 
 
 
 class SentimentAnalyzer:
-    def _get_score_from_twinword(self, query_string):
-        # Get score using twinword API
-        query_param = {"text":query_string}
-        score = http_get_response(url=rapid_api_url, headers=api_headers, params=query_param)
-
-        return score    
-
-    def _get_comment_scores(self, comments:List[Dict], sort_by_scores:bool):
+    def _get_comment_scores(self, comments:List[Dict], sort_by_scores:bool) ->List[Dict]:
+        # Iterate through each comments to get scores
         comment_scores = []
         for comment in comments:
             text = comment.get('text')
             if text:
-                score_data = self._get_score_from_twinword(text)
+                score_data = get_score_from_twinword(text)
                 if score_data and 'type' in score_data and 'score' in score_data:
                     score_info = {
                         'id':comment.get('id'),
@@ -95,7 +82,7 @@ class SentimentAnalyzer:
                     comment_scores.append(score_info)
                 else:
                     # Handle case where score data is missing or incomplete
-                    print(f"Unable to get score for comment: {text}")
+                    logger.error(f"Unable to get score for comment: {text}")
                     score_info = {'id':comment.get('id'),'text': text, 'type': None, 'score': None}
                     comment_scores.append(score_info)
         if sort_by_scores:
@@ -106,7 +93,7 @@ class SentimentAnalyzer:
         #Sort comments based on scores
         return sorted(list_of_comments, key=lambda x: x['score'], reverse=True)
 
-    def get_scores(self, subfeddit_title:str, skip_records:int=0, limit_records:int=25, sort_by_scores:bool=False):
+    def get_scores(self, subfeddit_title:str, skip_records:int=0, limit_records:int=25, sort_by_scores:bool=False) ->List[Dict]:
         """
         Get sentiment score for each comment
         
@@ -121,12 +108,10 @@ class SentimentAnalyzer:
         """
         subfeddit = get_subfeddit_by_title(subfeddit_title=subfeddit_title)
         if isinstance(subfeddit, str):
-            # Return the error message
-            return subfeddit
+            raise ValueError(subfeddit)
         
         comments = get_comments_by_id(subfeddit_id=subfeddit['id'],skip_records=skip_records,limit_records=limit_records)
         if isinstance(comments, str):
-            # Return the error message
-            return comments
+            raise ValueError(comments)
         
         return self._get_comment_scores(comments, sort_by_scores)
