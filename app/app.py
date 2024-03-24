@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from router import router
 
-app = FastAPI(version='1.0')
+
+app = FastAPI(version='1.0', title='Sencheck: A sentiment analyzer API')
 
 
 app.include_router(router, prefix="/api/v1")
