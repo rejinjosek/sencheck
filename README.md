@@ -33,6 +33,7 @@ GET /scores/?subfeddit_title=science&skip_records=10&limit_records=5&sort_by_sco
 
 #### Example Response
 
+
 ```json
 [
   {
@@ -57,3 +58,4 @@ GET /scores/?subfeddit_title=science&skip_records=10&limit_records=5&sort_by_sco
     "created_at": 1711174814
   }
 ]
+
