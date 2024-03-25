@@ -3,10 +3,12 @@
 ## Overview
 
 This API provides sentiment analysis scores for comments within a subreddit (referred to as 'subfeddit'). The sentiment scores help in understanding the general sentiment of the comments in a particular subreddit.
+
 ## How To Use
 
 - Place `config.py` inside the `app` folder with constant variable `RAPID_API_KEY` that holds twinword API key.
-- Run `docker compose up` from the root folder.
+- Run `docker compose build` from the root folder to build the local image.
+- Run `docker compose up` from the root folder to start the app.
 - Go to 'localhost:8000/docs' to see the API documentation.
 
 ## Endpoints
